@@ -9,19 +9,28 @@ public class GamePanel extends JPanel implements Runnable{
     final int originalTileSize = 16;
     final int scale = 3;
     final int tileSize = originalTileSize * scale;
+    final int fps = 60;
 
     final int maxScreenColumns = 16;
     final int maxScreenRows = 12;
     final int screenWidth = tileSize * maxScreenColumns;
     final int screenHeight = tileSize * maxScreenRows;
 
+    KeyHandler keyHandler = new KeyHandler();
+    Thread gameThread;
+
+    // DEFAULT PLAYER
+    public int playerX = 100;
+    public int playerY = 100;
+    public int playerSpeed = 4;
+
     public GamePanel() {
         this.setBackground(Color.black);
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setDoubleBuffered(true);
+        this.addKeyListener(keyHandler);
+        this.setFocusable(true);
     }
-
-    Thread gameThread;
 
     public void startGameThread() {
         gameThread = new Thread(this);
@@ -29,18 +38,41 @@ public class GamePanel extends JPanel implements Runnable{
     }
     @Override
     public void run() {
+        double drawInterval = 1000000000 / fps;
+        double nextDrawTime = System.nanoTime() + drawInterval;
+
         while(gameThread != null) {
-
-            // UPDATE: CHARACTER POSITION AND OTHER INFORMATION
             update();
-
-            // DRAW: AFTER THE UPDATED DATA, DRAW THE SCREEN
             repaint();
+
+            try {
+                double remainingTime = nextDrawTime - System.nanoTime();
+                remainingTime /= 1000000;
+
+                if (remainingTime < 0) {
+                    remainingTime = 0;
+                }
+
+                Thread.sleep((long) remainingTime);
+
+                nextDrawTime += drawInterval;
+
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     public void update() {
-
+        if (keyHandler.upPressed) {
+            playerY -= playerSpeed;
+        } else if (keyHandler.downPressed) {
+            playerY += playerSpeed;
+        } else if (keyHandler.leftPressed) {
+            playerX -= playerSpeed;
+        }  else if (keyHandler.rightPressed) {
+            playerX += playerSpeed;
+        }
     }
 
     public void paintComponent(Graphics g) {
@@ -48,6 +80,8 @@ public class GamePanel extends JPanel implements Runnable{
 
         Graphics2D g2d = (Graphics2D)g;
 
-        
+        g2d.setColor(Color.white);
+        g2d.fillRect(playerX, playerY, tileSize, tileSize);
+        g2d.dispose();
     }
 }

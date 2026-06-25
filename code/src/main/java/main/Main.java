@@ -10,13 +10,14 @@ public class Main {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setTitle("2D Game");
         frame.setResizable(false);
-        frame.setVisible(true);
-        frame.setLocationRelativeTo(null);
 
         //Game Panel Class
         GamePanel gamePanel = new GamePanel();
         frame.add(gamePanel);
         frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
         gamePanel.startGameThread();
 
     }
