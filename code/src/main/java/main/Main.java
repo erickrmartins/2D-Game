@@ -17,8 +17,7 @@ public class Main {
         GamePanel gamePanel = new GamePanel();
         frame.add(gamePanel);
         frame.pack();
-
-
+        gamePanel.startGameThread();
 
     }
 }
